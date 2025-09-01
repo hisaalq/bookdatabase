@@ -15,6 +15,10 @@ const bookSchema = new Schema({
         ref: "Category",
         required: true,
     },
+    image: {
+        type: String,
+       
+    },
 });
 
 export default model("Book", bookSchema);

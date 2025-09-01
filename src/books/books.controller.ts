@@ -26,8 +26,13 @@ export const getBookById = async (req: Request, res: Response, next: NextFunctio
 
 export const createBook = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { title, author, category } = req.body;
-        const book = await Book.create({ title, author, category });
+        const { title, author, category, image } = req.body;
+        const book = await Book.create({ title, author, category, image });
+        const imagePath = req.file?.path;
+        if (imagePath) {
+            book.image = imagePath;
+            await book.save();
+        }
         await Author.findByIdAndUpdate(author, { $push: { books: book._id } });
         await Category.findByIdAndUpdate(category, { $push: { books: book._id } });
         res.status(201).json(book);
@@ -40,7 +45,8 @@ export const createBook = async (req: Request, res: Response, next: NextFunction
     try {
         const { id } = req.params;
         const { name } = req.body;
-        const book = await Book.findByIdAndUpdate(id, { name }, { new: true });
+        const imagePath = req.file?.path;
+        const book = await Book.findByIdAndUpdate(id, { name, image: imagePath }, { new: true });
         if (!book) {
             return res.status(404).json({ message: "Book not found" });
         }
